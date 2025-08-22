@@ -1,34 +1,35 @@
-research_task:
+input_task:
   description: >
-    Conduct a thorough research about {topic}
-    Make sure you find any interesting and relevant information given
-    the current year is {current_year}.
+    Receive the topic and prepare the workflow for execution.
   expected_output: >
-    A list with 10 bullet points of the most relevant information about {topic}
-  agent: researcher
+    A confirmation and structured version of the input topic.
+  agent: input_agent
+
+keyword_task:
+  description: >
+    Extract or generate the 5-10 most relevant keywords for {topic}. Validate them with Pydantic to ensure
+    they are unique, relevant, and non-empty.
+  expected_output: >
+    A validated list of 5-10 keywords.
+  agent: keyword_agent
+
+story_task:
+  description: >
+    Use the validated keywords to write a structured, engaging, and informative story/article about {topic}.
+  expected_output: >
+    A story or article formatted in markdown without code fences.
+  agent: story_agent
+
+evaluation_task:
+  description: >
+    Review the story for quality, factual accuracy, clarity, and logical flow. Suggest improvements if necessary.
+  expected_output: >
+    A markdown evaluation report highlighting strengths, weaknesses, and corrections.
+  agent: evaluation_agent
 
 reporting_task:
   description: >
-    Review the context you got and expand each topic into a full section for a report.
-    Make sure the report is detailed and contains any and all relevant information.
+    Collect outputs from all agents, evaluate the workflows performance, and generate a final markdown report file.
   expected_output: >
-    A fully fledged report with the main topics, each with a full section of information.
-    Formatted as markdown without '```'
-  agent: reporting_analyst
-
-summarization_task:
-  description: >
-    Summarize the research and report findings on {topic} into a concise overview.
-    Highlight only the most important points so it's easy to digest quickly.
-  expected_output: >
-    A short markdown summary (max 1 page) covering the main insights about {topic}.
-  agent: summarizer
-
-error_detection_task:
-  description: >
-    Review the research and reports about {topic} carefully to identify any
-    errors, inconsistencies, or logical flaws.
-  expected_output: >
-    A markdown list of detected errors, contradictions, or weak arguments,
-    with suggested corrections.
-  agent: error_detector
+    A final report that summarizes the topic, the workflow steps, and the final outputs.
+  agent: reporting_agent

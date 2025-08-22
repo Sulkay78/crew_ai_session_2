@@ -2,103 +2,111 @@ from crewai import Agent, Crew, Process, Task, LLM
 from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from typing import List
-
 from dotenv import load_dotenv
 import os
+
+# Load environment variables (MODEL and GEMINI_API_KEY should be in your .env)
 load_dotenv()
-# If you want to run a snippet of code before or after the crew starts,
-# you can use the @before_kickoff and @after_kickoff decorators
-# https://docs.crewai.com/concepts/crews#example-crew-class-with-decorators
 
 @CrewBase
 class MyCrew():
-    """MyCrew crew"""
+    """Capstone CrewAI Workflow"""
 
     agents: List[BaseAgent]
     tasks: List[Task]
 
-
+    # Define LLM
     llm = LLM(
         model=os.environ["MODEL"],
         api_key=os.environ["GEMINI_API_KEY"]
     )
-    # Learn more about YAML configuration files here:
-    # Agents: https://docs.crewai.com/concepts/agents#yaml-configuration-recommended
-    # Tasks: https://docs.crewai.com/concepts/tasks#yaml-configuration-recommended
-    
-    # If you would like to add tools to your agents, you can learn more about it here:
-    # https://docs.crewai.com/concepts/agents#agent-tools
+
+    # =========================
+    # AGENTS
+    # =========================
     @agent
-    def researcher(self) -> Agent:
+    def input_agent(self) -> Agent:
         return Agent(
-            config=self.agents_config['researcher'], # type: ignore[index]
+            config=self.agents_config['input_agent'],
             verbose=True,
             llm=self.llm
         )
 
     @agent
-    def reporting_analyst(self) -> Agent:
+    def keyword_agent(self) -> Agent:
         return Agent(
-            config=self.agents_config['reporting_analyst'], # type: ignore[index]
-            verbose=True,
-            llm=self.llm
-        )
-    
-    @agent 
-    def summarizer(self) -> Agent:
-        return Agent(
-             config=self.agents_config['summarizer'],  # Add summarizer config in agents.yaml
-            verbose=True,
-            llm=self.llm
-        )
-    @agent
-    def error_detector(self) -> Agent:
-        return Agent(
-            config=self.agents_config['error_detector'],  # Add error_detector config in agents.yaml
+            config=self.agents_config['keyword_agent'],
             verbose=True,
             llm=self.llm
         )
 
-    # To learn more about structured task outputs,
-    # task dependencies, and task callbacks, check out the documentation:
-    # https://docs.crewai.com/concepts/tasks#overview-of-a-task
+    @agent
+    def story_agent(self) -> Agent:
+        return Agent(
+            config=self.agents_config['story_agent'],
+            verbose=True,
+            llm=self.llm
+        )
+
+    @agent
+    def evaluation_agent(self) -> Agent:
+        return Agent(
+            config=self.agents_config['evaluation_agent'],
+            verbose=True,
+            llm=self.llm
+        )
+
+    @agent
+    def reporting_agent(self) -> Agent:
+        return Agent(
+            config=self.agents_config['reporting_agent'],
+            verbose=True,
+            llm=self.llm
+        )
+
+    # =========================
+    # TASKS
+    # =========================
     @task
-    def research_task(self) -> Task:
+    def input_task(self) -> Task:
         return Task(
-            config=self.tasks_config['research_task'], # type: ignore[index]
+            config=self.tasks_config['input_task']
+        )
+
+    @task
+    def keyword_task(self) -> Task:
+        return Task(
+            config=self.tasks_config['keyword_task']
+        )
+
+    @task
+    def story_task(self) -> Task:
+        return Task(
+            config=self.tasks_config['story_task']
+        )
+
+    @task
+    def evaluation_task(self) -> Task:
+        return Task(
+            config=self.tasks_config['evaluation_task']
         )
 
     @task
     def reporting_task(self) -> Task:
         return Task(
-            config=self.tasks_config['reporting_task'], # type: ignore[index]
-            output_file='report.md'
-        )
-    
-    @task
-    def summarization_task(self) -> Task:
-        return Task(
-            config=self.tasks_config['summarization_task'],
-            output_file='summary.md'
+            config=self.tasks_config['reporting_task'],
+            output_file="final_report.md"  # Save final report here
         )
 
-    @task
-    def error_detection_task(self) -> Task:
-        return Task(
-            config=self.tasks_config['error_detection_task'],
-            output_file='errors.md'
-        )
-
+    # =========================
+    # CREW
+    # =========================
     @crew
     def crew(self) -> Crew:
-        """Creates the MyCrew crew"""
-        # To learn how to add knowledge sources to your crew, check out the documentation:
-        # https://docs.crewai.com/concepts/knowledge#what-is-knowledge
-
+        """Creates the Capstone Crew"""
         return Crew(
-            agents=self.agents, # Automatically created by the @agent decorator
-            tasks=self.tasks, # Automatically created by the @task decorator
-            process=Process.sequential,
+            agents=self.agents,   # Auto-collected from @agent
+            tasks=self.tasks,     # Auto-collected from @task
+            process=Process.sequential,  # Sequential pipeline
             verbose=True,
-            # process=Process.hierarchical, # In case you wanna use that instead https://docs.crewai.com/how-to/Hierarchical/
         )
