@@ -1,0 +1,15 @@
+
+database:
+  url: 'localhost:8888'
+  username: "sulaiman"
+  password: '32453222'
+  content: > 
+     this configuration for database connection 
+     and I am the pprogrammer
+     
+
+logging_bucket:
+  url: "www.s3_bucket.com"
+  username: "ahmed"
+  password: "023924"
+  
